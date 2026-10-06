@@ -1,0 +1,19 @@
+name: dev-build
+
+on: [push, pull_request]
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Build and start dev stack
+        run: docker compose up -d --build
+      - name: Check the app responds
+        run: |
+          for i in $(seq 1 30); do
+            curl -sf http://localhost:5083/ && exit 0
+            sleep 2
+          done
+          docker compose logs
+          exit 1
